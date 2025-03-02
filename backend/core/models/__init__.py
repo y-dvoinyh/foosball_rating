@@ -1,9 +1,9 @@
 __all__ = (
     "db_helper",
     "Base",
-    "Player"
+    "User"
 )
 
 from .db_helper import db_helper
 from .base import Base
-from .player import Player
+from .user import User
