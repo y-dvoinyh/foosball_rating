@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 
 from core.config import settings
 from core.models import db_helper
@@ -21,6 +22,7 @@ def get_application() -> FastAPI:
         # title=settings.PROJECT_NAME,
         # debug=settings.DEBUG,
         # version=settings.VERSION
+        default_response_class=ORJSONResponse,
         lifespan=lifespan
     )
     application.include_router(api_router, prefix=settings.api.prefix)
