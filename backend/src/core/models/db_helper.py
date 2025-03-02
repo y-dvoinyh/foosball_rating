@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSessio
 from core.config import settings
 
 
-class DataBAseHelper:
+class DatabaseHelper:
     def __init__(
         self,
         url: str,
@@ -36,7 +36,7 @@ class DataBAseHelper:
             yield session
 
 
-db_helper = DataBAseHelper(
+db_helper = DatabaseHelper(
     url=str(settings.db.url),
     echo=settings.db.echo,
     echo_pool=settings.db.echo_pool,
