@@ -25,7 +25,7 @@ def get_application() -> FastAPI:
         default_response_class=ORJSONResponse,
         lifespan=lifespan
     )
-    application.include_router(api_router, prefix=settings.api.prefix)
+    application.include_router(api_router)
 
     # application.add_middleware(
     #     CORSMiddleware,
