@@ -53,6 +53,7 @@ nav:
   - Frontend:
       - Обзор: frontend/overview.md
       - Административная панель: frontend/admin-panel.md
+      - Тестирование: frontend/testing.md
   - Разработка:
       - Локальный запуск: dev/local-setup.md
       - Git workflow: dev/git-workflow.md

@@ -259,3 +259,20 @@ pytest
 ```powershell
 docker compose run --rm backend-tests
 ```
+
+## Тесты frontend
+
+Unit/component тесты frontend запускаются через Vitest.
+
+Запуск локально:
+
+```powershell
+cd frontend
+npm run test
+```
+
+Запуск через Docker Compose:
+
+```powershell
+docker compose run --rm frontend-tests
+```
