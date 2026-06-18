@@ -207,7 +207,16 @@ docker compose up --build
 - API docs: http://localhost:8000/docs
 - Nginx entrypoint: http://localhost:8080
 - PostgreSQL: localhost:5432
+- pgAdmin: http://localhost:5050
 - DB migrations: выполняются one-shot сервисом `migrate` перед запуском backend.
+
+Подключение к PostgreSQL из pgAdmin:
+
+- Host: `db`
+- Port: `5432`
+- Database: значение `POSTGRES_DB`
+- Username: значение `POSTGRES_USER`
+- Password: значение `POSTGRES_PASSWORD`
 
 ## Миграции БД
 
