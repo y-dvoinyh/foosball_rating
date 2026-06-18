@@ -16,6 +16,28 @@ docker compose up --build
 - pgAdmin: http://localhost:5050
 - DB migrations: выполняются one-shot сервисом `migrate` перед запуском backend.
 
+## Hot reload
+
+Hot reload включен в dev-окружении:
+
+- backend запускается через `uvicorn --reload`;
+- frontend запускается через `quasar dev`;
+- `./backend` и `./frontend` подключены в контейнеры через bind mounts;
+- для Docker Desktop и Windows включен polling file watcher.
+
+Backend polling:
+
+```yaml
+WATCHFILES_FORCE_POLLING: "true"
+```
+
+Frontend polling:
+
+```yaml
+CHOKIDAR_USEPOLLING: "true"
+WATCHPACK_POLLING: "true"
+```
+
 ## Инструменты разработки
 
 Установить dev-инструменты:

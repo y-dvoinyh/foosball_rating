@@ -257,6 +257,13 @@ docker compose up --build
 - pgAdmin: http://localhost:5050
 - DB migrations: выполняются one-shot сервисом `migrate` перед запуском backend.
 
+Hot reload включен для dev-контейнеров:
+
+- backend запускается через `uvicorn --reload`;
+- frontend запускается через `quasar dev`;
+- исходники подключены в контейнеры через bind mounts;
+- для надежного отслеживания изменений в Docker Desktop включен polling.
+
 Подключение к PostgreSQL из pgAdmin:
 
 - Host: `db`
