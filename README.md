@@ -207,3 +207,21 @@ docker compose up --build
 - API docs: http://localhost:8000/docs
 - Nginx entrypoint: http://localhost:8080
 - PostgreSQL: localhost:5432
+
+## Миграции БД
+
+Alembic настроен в директории `backend/`.
+
+Создать миграцию:
+
+```powershell
+cd backend
+alembic revision --autogenerate -m "migration name"
+```
+
+Применить миграции:
+
+```powershell
+cd backend
+alembic upgrade head
+```

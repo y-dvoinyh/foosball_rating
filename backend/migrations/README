@@ -1,0 +1,9 @@
+Alembic migrations for the FastAPI backend.
+
+Common commands should be run from the `backend` directory:
+
+```powershell
+alembic revision --autogenerate -m "create users"
+alembic upgrade head
+alembic downgrade -1
+```
