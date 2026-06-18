@@ -242,3 +242,20 @@ alembic revision --autogenerate -m "migration name"
 cd backend
 alembic upgrade head
 ```
+
+## Тесты backend
+
+Тесты backend запускаются через pytest.
+
+Запуск локально:
+
+```powershell
+cd backend
+pytest
+```
+
+Запуск через Docker Compose:
+
+```powershell
+docker compose run --rm backend-tests
+```

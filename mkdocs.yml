@@ -49,6 +49,7 @@ nav:
       - Аутентификация и права: backend/auth-and-permissions.md
       - Импорт данных: backend/import.md
       - Расчет рейтинга: backend/rating-calculation.md
+      - Тестирование: backend/testing.md
   - Frontend:
       - Обзор: frontend/overview.md
       - Административная панель: frontend/admin-panel.md

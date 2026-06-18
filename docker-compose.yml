@@ -59,6 +59,22 @@ services:
       db:
         condition: service_healthy
 
+  backend-tests:
+    build:
+      context: ./backend
+    command: pytest
+    environment:
+      APP_NAME: ${APP_NAME}
+      DATABASE_URL: ${DATABASE_URL}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
   frontend:
     build:
       context: ./frontend
