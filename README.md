@@ -138,6 +138,42 @@ mkdocs build
 http://127.0.0.1:8000
 ```
 
+## Инструменты разработки
+
+Установить dev-инструменты для pre-commit и документации:
+
+```powershell
+pip install -r requirements-dev.txt
+pre-commit install
+```
+
+Основные команды:
+
+```powershell
+make up
+make test
+make lint
+make format
+make docs
+```
+
+Backend:
+
+```powershell
+cd backend
+ruff check .
+ruff format .
+```
+
+Frontend:
+
+```powershell
+cd frontend
+npm run lint
+npm run format:check
+npm run typecheck
+```
+
 ## Git workflow
 
 Используем облегченную схему:

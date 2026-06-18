@@ -1,0 +1,5 @@
+node_modules
+dist
+.quasar
+coverage
+package-lock.json

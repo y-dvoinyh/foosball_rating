@@ -16,6 +16,40 @@ docker compose up --build
 - pgAdmin: http://localhost:5050
 - DB migrations: выполняются one-shot сервисом `migrate` перед запуском backend.
 
+## Инструменты разработки
+
+Установить dev-инструменты:
+
+```powershell
+pip install -r requirements-dev.txt
+pre-commit install
+```
+
+Основные команды через Makefile:
+
+```powershell
+make up
+make test
+make lint
+make format
+make docs
+```
+
+Проверки можно запускать и напрямую:
+
+```powershell
+cd backend
+ruff check .
+ruff format .
+```
+
+```powershell
+cd frontend
+npm run lint
+npm run format:check
+npm run typecheck
+```
+
 ## pgAdmin
 
 Доступ в pgAdmin:

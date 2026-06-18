@@ -1,0 +1,2 @@
+pre-commit==4.0.1
+mkdocs-material==9.5.49
