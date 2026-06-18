@@ -1,4 +1,4 @@
-.PHONY: up down logs compose-config migrate test test-backend test-frontend lint lint-backend lint-frontend format format-backend format-frontend docs docs-build
+.PHONY: up down logs compose-config migrate worker beat test test-backend test-frontend lint lint-backend lint-frontend format format-backend format-frontend docs docs-build
 
 up:
 	docker compose up --build
@@ -14,6 +14,12 @@ compose-config:
 
 migrate:
 	docker compose up migrate
+
+worker:
+	docker compose up celery-worker
+
+beat:
+	docker compose up celery-beat
 
 test: test-backend test-frontend
 

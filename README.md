@@ -254,7 +254,10 @@ docker compose up --build
 - API docs: http://localhost:8000/docs
 - Nginx entrypoint: http://localhost:8080
 - PostgreSQL: localhost:5432
+- Redis: localhost:6379
 - pgAdmin: http://localhost:5050
+- Celery worker: сервис `celery-worker`
+- Celery Beat: сервис `celery-beat`
 - DB migrations: выполняются one-shot сервисом `migrate` перед запуском backend.
 
 Hot reload включен для dev-контейнеров:

@@ -39,6 +39,7 @@ nav:
   - Главная: index.md
   - Архитектура:
       - Обзор: architecture/overview.md
+      - Статус стека: architecture/stack-status.md
       - ADR:
           - "0001: FastAPI stack": architecture/adr/0001-fastapi-stack.md
           - "0002: Git workflow": architecture/adr/0002-git-workflow.md

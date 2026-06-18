@@ -15,6 +15,19 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   pgadmin:
     image: dpage/pgadmin4:8
     environment:
@@ -34,6 +47,9 @@ services:
     environment:
       APP_NAME: ${APP_NAME}
       DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
       CORS_ORIGINS: ${CORS_ORIGINS}
       WATCHFILES_FORCE_POLLING: "true"
     ports:
@@ -42,6 +58,8 @@ services:
       - ./backend:/app
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
@@ -53,6 +71,9 @@ services:
     environment:
       APP_NAME: ${APP_NAME}
       DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
       CORS_ORIGINS: ${CORS_ORIGINS}
     volumes:
       - ./backend:/app
@@ -61,22 +82,71 @@ services:
         condition: service_healthy
 
   backend-tests:
+    profiles:
+      - tools
     build:
       context: ./backend
     command: pytest
     environment:
       APP_NAME: ${APP_NAME}
       DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
       CORS_ORIGINS: ${CORS_ORIGINS}
     volumes:
       - ./backend:/app
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
 
+  celery-worker:
+    build:
+      context: ./backend
+    command: celery -A app.core.celery_app:celery_app worker --loglevel=info
+    environment:
+      APP_NAME: ${APP_NAME}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  celery-beat:
+    build:
+      context: ./backend
+    command: celery -A app.core.celery_app:celery_app beat --loglevel=info
+    environment:
+      APP_NAME: ${APP_NAME}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL}
+      CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+      celery-worker:
+        condition: service_started
+
   backend-lint:
+    profiles:
+      - tools
     build:
       context: ./backend
     command: ruff check .
@@ -100,6 +170,8 @@ services:
       - backend
 
   frontend-tests:
+    profiles:
+      - tools
     build:
       context: ./frontend
     command: npm run test
@@ -111,6 +183,8 @@ services:
       - frontend-node-modules:/app/node_modules
 
   frontend-lint:
+    profiles:
+      - tools
     build:
       context: ./frontend
     command: npm run lint
@@ -132,3 +206,4 @@ volumes:
   postgres-data:
   frontend-node-modules:
   pgadmin-data:
+  redis-data:

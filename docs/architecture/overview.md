@@ -13,6 +13,7 @@ Foosball Rating хранит и показывает рейтинги игрок
 - `db` - PostgreSQL как основное хранилище.
 - `redis` - broker для Celery, временные коды, статусы задач, легкий кеш.
 - `worker` - Celery worker для фоновых задач.
+- `beat` - Celery Beat для периодических задач.
 - `nginx` - единая точка входа и reverse proxy.
 
 ## Основные принципы

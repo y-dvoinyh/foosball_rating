@@ -34,6 +34,9 @@ Docker Compose:
 
 - `docker compose config`.
 
+Перед проверкой Docker Compose workflow создает локальный `.env` из
+`.env.example`.
+
 ## Важные замечания
 
 Во frontend пока нет `package-lock.json`, поэтому CI использует `npm install`.

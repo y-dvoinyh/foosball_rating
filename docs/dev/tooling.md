@@ -61,6 +61,8 @@ pre-commit run --all-files
 ```powershell
 make up
 make down
+make worker
+make beat
 make test
 make lint
 make format
