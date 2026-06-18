@@ -174,6 +174,17 @@ npm run format:check
 npm run typecheck
 ```
 
+## CI
+
+CI настроен через GitHub Actions в `.github/workflows/ci.yml`.
+
+Проверки запускаются при push и pull request в `main` и `develop`:
+
+- backend lint, format check и tests;
+- frontend lint, format check, typecheck и tests;
+- сборка MkDocs-документации;
+- валидация Docker Compose config.
+
 ## Git workflow
 
 Используем облегченную схему:
