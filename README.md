@@ -207,10 +207,18 @@ docker compose up --build
 - API docs: http://localhost:8000/docs
 - Nginx entrypoint: http://localhost:8080
 - PostgreSQL: localhost:5432
+- DB migrations: выполняются one-shot сервисом `migrate` перед запуском backend.
 
 ## Миграции БД
 
 Alembic настроен в директории `backend/`.
+
+При обычном запуске через Docker Compose миграции автоматически применяются
+отдельным сервисом:
+
+```powershell
+docker compose up migrate
+```
 
 Создать миграцию:
 
