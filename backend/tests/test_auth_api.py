@@ -30,6 +30,7 @@ def test_register_returns_access_token_and_sets_refresh_cookie(
     assert response_body["token_type"] == "bearer"
     assert "refresh_token" not in response_body
     assert response.cookies.get("refresh_token")
+    assert response.cookies.get("auth_session") == "1"
     assert "HttpOnly" in response.headers["set-cookie"]
     assert "SameSite=lax" in response.headers["set-cookie"]
 
@@ -95,6 +96,7 @@ def test_login_returns_access_token_for_valid_credentials(
     assert response.status_code == 200
     assert "refresh_token" not in response.json()
     assert response.cookies.get("refresh_token")
+    assert response.cookies.get("auth_session") == "1"
     assert decode_access_token(response.json()["access_token"]).subject == (
         decode_access_token(register_response.json()["access_token"]).subject
     )
@@ -120,6 +122,7 @@ def test_oauth_token_endpoint_returns_token_pair_for_swagger_authorize(
     assert response.status_code == 200
     assert "refresh_token" not in response.json()
     assert response.cookies.get("refresh_token")
+    assert response.cookies.get("auth_session") == "1"
     assert decode_access_token(response.json()["access_token"]).subject == (
         decode_access_token(register_response.json()["access_token"]).subject
     )
@@ -151,6 +154,7 @@ def test_refresh_rotates_refresh_token(
 
     assert refresh_response.status_code == 200
     assert refresh_response.cookies.get("refresh_token") != old_refresh_token
+    assert refresh_response.cookies.get("auth_session") == "1"
     assert decode_access_token(refresh_response.json()["access_token"]).subject == (
         decode_access_token(register_response.json()["access_token"]).subject
     )
@@ -211,6 +215,7 @@ def test_logout_revokes_refresh_cookie(
     assert logout_response.status_code == 204
     assert logout_response.content == b""
     assert "refresh_token=" in logout_response.headers["set-cookie"]
+    assert "auth_session=" in logout_response.headers["set-cookie"]
     assert refresh_response.status_code == 401
     assert refresh_response.json() == {"detail": "Invalid refresh token"}
 

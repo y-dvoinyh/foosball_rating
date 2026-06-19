@@ -26,6 +26,8 @@ const state = reactive<AuthState>({
   errorMessage: null
 });
 
+const AUTH_SESSION_HINT_COOKIE_NAME = 'auth_session';
+
 const isAuthenticated = computed(() => state.currentUser !== null && state.accessToken !== null);
 
 export function useAuth() {
@@ -38,6 +40,11 @@ export function useAuth() {
     state.errorMessage = null;
 
     try {
+      if (!hasAuthSessionHint()) {
+        clearSession();
+        return;
+      }
+
       const tokens = await authApiService.refresh();
       await applyAccessToken(tokens);
     } catch {
@@ -94,12 +101,28 @@ async function authenticate(request: () => Promise<AccessTokenResponse>): Promis
 async function applyAccessToken(tokens: AccessTokenResponse): Promise<void> {
   state.accessToken = tokens.access_token;
   state.currentUser = await authApiService.me(tokens.access_token);
+  saveAuthSessionHint();
 }
 
 function clearSession(): void {
   state.accessToken = null;
   state.currentUser = null;
   state.errorMessage = null;
+  clearAuthSessionHint();
+}
+
+function hasAuthSessionHint(): boolean {
+  return document.cookie
+    .split('; ')
+    .some((cookie) => cookie === `${AUTH_SESSION_HINT_COOKIE_NAME}=1`);
+}
+
+function saveAuthSessionHint(): void {
+  document.cookie = `${AUTH_SESSION_HINT_COOKIE_NAME}=1; Max-Age=2592000; Path=/; SameSite=Lax`;
+}
+
+function clearAuthSessionHint(): void {
+  document.cookie = `${AUTH_SESSION_HINT_COOKIE_NAME}=; Max-Age=0; Path=/; SameSite=Lax`;
 }
 
 function clearLegacyStoredTokens(): void {

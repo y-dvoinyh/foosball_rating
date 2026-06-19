@@ -105,6 +105,8 @@ access token; новый refresh token устанавливается в cookie.
 
 - access token хранится в памяти frontend-приложения;
 - refresh token хранится в `HttpOnly`, `Secure`, `SameSite` cookie.
+- frontend может использовать отдельную не секретную cookie-подсказку без токена,
+  чтобы не отправлять refresh-запрос при заведомом отсутствии сессии.
 
 В локальной разработке cookie может быть без флага `Secure`, потому что
 `Secure` cookie не отправляется браузером по `http://localhost`. Для production

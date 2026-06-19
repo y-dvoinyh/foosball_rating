@@ -26,6 +26,7 @@ from app.core.config import settings
 from app.db.session import get_session
 
 REFRESH_TOKEN_COOKIE_NAME = "refresh_token"
+AUTH_SESSION_COOKIE_NAME = "auth_session"
 REFRESH_TOKEN_COOKIE_PATH = "/"
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -160,11 +161,20 @@ async def logout(
 
 
 def set_refresh_token_cookie(response: Response, refresh_token: str) -> None:
+    max_age = settings.refresh_token_expire_days * 24 * 60 * 60
     response.set_cookie(
         key=REFRESH_TOKEN_COOKIE_NAME,
         value=refresh_token,
-        max_age=settings.refresh_token_expire_days * 24 * 60 * 60,
+        max_age=max_age,
         httponly=True,
+        secure=settings.refresh_token_cookie_secure,
+        samesite="lax",
+        path=REFRESH_TOKEN_COOKIE_PATH,
+    )
+    response.set_cookie(
+        key=AUTH_SESSION_COOKIE_NAME,
+        value="1",
+        max_age=max_age,
         secure=settings.refresh_token_cookie_secure,
         samesite="lax",
         path=REFRESH_TOKEN_COOKIE_PATH,
@@ -176,6 +186,12 @@ def clear_refresh_token_cookie(response: Response) -> None:
         key=REFRESH_TOKEN_COOKIE_NAME,
         path=REFRESH_TOKEN_COOKIE_PATH,
         httponly=True,
+        secure=settings.refresh_token_cookie_secure,
+        samesite="lax",
+    )
+    response.delete_cookie(
+        key=AUTH_SESSION_COOKIE_NAME,
+        path=REFRESH_TOKEN_COOKIE_PATH,
         secure=settings.refresh_token_cookie_secure,
         samesite="lax",
     )
