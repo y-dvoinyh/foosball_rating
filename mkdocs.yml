@@ -47,6 +47,7 @@ nav:
   - Backend:
       - Обзор: backend/overview.md
       - Фоновые задачи: backend/background-jobs.md
+      - Архитектура аутентификации: backend/auth-architecture.md
       - Аутентификация и права: backend/auth-and-permissions.md
       - Импорт данных: backend/import.md
       - Расчет рейтинга: backend/rating-calculation.md
