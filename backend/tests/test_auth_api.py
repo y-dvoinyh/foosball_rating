@@ -11,7 +11,7 @@ def email_prefix() -> str:
     return f"auth_it_{uuid4().hex}"
 
 
-def test_register_returns_access_token(
+def test_register_returns_token_pair(
     client: TestClient,
     email_prefix: str,
 ) -> None:
@@ -23,6 +23,7 @@ def test_register_returns_access_token(
     assert response.status_code == 201
     response_body = response.json()
     assert response_body["token_type"] == "bearer"
+    assert response_body["refresh_token"]
 
     token_payload = decode_access_token(response_body["access_token"])
     assert token_payload.subject.isdigit()
@@ -84,9 +85,51 @@ def test_login_returns_access_token_for_valid_credentials(
 
     assert register_response.status_code == 201
     assert response.status_code == 200
+    assert response.json()["refresh_token"]
     assert decode_access_token(response.json()["access_token"]).subject == (
         decode_access_token(register_response.json()["access_token"]).subject
     )
+
+
+def test_refresh_rotates_refresh_token(
+    client: TestClient,
+    email_prefix: str,
+) -> None:
+    email = f"{email_prefix}@example.com"
+    register_response = client.post(
+        "/auth/register",
+        json={"email": email, "password": "correct-password"},
+    )
+    old_refresh_token = register_response.json()["refresh_token"]
+
+    refresh_response = client.post(
+        "/auth/refresh",
+        json={"refresh_token": old_refresh_token},
+    )
+
+    assert refresh_response.status_code == 200
+    assert refresh_response.json()["refresh_token"] != old_refresh_token
+    assert decode_access_token(refresh_response.json()["access_token"]).subject == (
+        decode_access_token(register_response.json()["access_token"]).subject
+    )
+
+    old_token_response = client.post(
+        "/auth/refresh",
+        json={"refresh_token": old_refresh_token},
+    )
+    assert old_token_response.status_code == 401
+    assert old_token_response.json() == {"detail": "Invalid refresh token"}
+
+
+def test_refresh_rejects_unknown_refresh_token(client: TestClient) -> None:
+    response = client.post(
+        "/auth/refresh",
+        json={"refresh_token": "unknown-refresh-token-value-that-is-long-enough"},
+    )
+
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Bearer"
+    assert response.json() == {"detail": "Invalid refresh token"}
 
 
 def test_login_rejects_invalid_password(

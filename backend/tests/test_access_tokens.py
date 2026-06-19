@@ -8,7 +8,9 @@ from app.auth.tokens import (
     JWT_ALGORITHM,
     AccessTokenError,
     create_access_token,
+    create_refresh_token,
     decode_access_token,
+    hash_refresh_token,
 )
 from app.core.config import settings
 
@@ -83,3 +85,28 @@ def test_decode_access_token_rejects_wrong_secret() -> None:
 
     with pytest.raises(AccessTokenError):
         decode_access_token(token)
+
+
+def test_create_refresh_token_returns_hashed_token_data() -> None:
+    refresh_token = create_refresh_token()
+
+    assert refresh_token.token
+    assert refresh_token.token_hash == hash_refresh_token(refresh_token.token)
+    assert refresh_token.token_hash != refresh_token.token
+    assert refresh_token.token_id
+    assert refresh_token.expires_at
+
+
+def test_create_refresh_token_uses_unique_values() -> None:
+    first_token = create_refresh_token()
+    second_token = create_refresh_token()
+
+    assert first_token.token != second_token.token
+    assert first_token.token_hash != second_token.token_hash
+    assert first_token.token_id != second_token.token_id
+
+
+def test_hash_refresh_token_is_deterministic() -> None:
+    token = "refresh-token"
+
+    assert hash_refresh_token(token) == hash_refresh_token(token)

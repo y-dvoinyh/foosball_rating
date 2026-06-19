@@ -178,7 +178,7 @@ refresh token received
 
 - регистрацию по email и password;
 - безопасное хеширование паролей;
-- login с выпуском access token;
+- login с выпуском access token и refresh token;
 - refresh token rotation;
 - logout с отзывом refresh token;
 - endpoint `/auth/me`;

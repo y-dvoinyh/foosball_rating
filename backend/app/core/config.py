@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     auth_secret_key: str = "change-me"
     access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 30
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

@@ -1,3 +1,6 @@
+import hashlib
+import hmac
+import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -10,6 +13,7 @@ from app.core.config import settings
 
 ACCESS_TOKEN_TYPE = "access"
 JWT_ALGORITHM = "HS256"
+REFRESH_TOKEN_BYTES = 64
 
 
 class AccessTokenError(ValueError):
@@ -22,6 +26,14 @@ class AccessTokenPayload:
     expires_at: datetime
     issued_at: datetime
     token_id: str
+
+
+@dataclass(frozen=True)
+class RefreshTokenData:
+    token: str
+    token_hash: str
+    token_id: str
+    expires_at: datetime
 
 
 def create_access_token(
@@ -44,6 +56,24 @@ def create_access_token(
     }
 
     return jwt.encode(payload, settings.auth_secret_key, algorithm=JWT_ALGORITHM)
+
+
+def create_refresh_token() -> RefreshTokenData:
+    token = secrets.token_urlsafe(REFRESH_TOKEN_BYTES)
+    return RefreshTokenData(
+        token=token,
+        token_hash=hash_refresh_token(token),
+        token_id=str(uuid4()),
+        expires_at=datetime.now(UTC) + timedelta(days=settings.refresh_token_expire_days),
+    )
+
+
+def hash_refresh_token(token: str) -> str:
+    return hmac.new(
+        key=settings.auth_secret_key.encode(),
+        msg=token.encode(),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
 
 
 def decode_access_token(token: str) -> AccessTokenPayload:
