@@ -19,4 +19,5 @@ known-first-party = ["app"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-line-ending = "auto"
+line-ending = "lf"
+docstring-code-format = true

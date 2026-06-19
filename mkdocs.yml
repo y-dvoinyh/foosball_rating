@@ -58,6 +58,7 @@ nav:
   - Разработка:
       - Локальный запуск: dev/local-setup.md
       - Инструменты разработки: dev/tooling.md
+      - Стиль Python-кода: dev/python-style.md
       - CI: dev/ci.md
       - Git workflow: dev/git-workflow.md
       - Документация: dev/documentation.md

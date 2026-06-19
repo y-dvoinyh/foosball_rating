@@ -39,8 +39,7 @@ Docker Compose:
 
 ## Важные замечания
 
-Во frontend пока нет `package-lock.json`, поэтому CI использует `npm install`.
-После появления lock-файла команду в CI стоит заменить на `npm ci`.
+Во frontend есть `package-lock.json`, поэтому CI использует `npm ci`.
 
 CI должен оставаться отражением локальных команд. Если меняется команда в
 README, Makefile или `package.json`, нужно проверить, что workflow остается

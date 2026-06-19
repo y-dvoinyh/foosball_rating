@@ -7,8 +7,10 @@
 - `ruff check .` - линтинг.
 - `ruff check . --fix` - автоисправления.
 - `ruff format .` - форматирование.
+- `ruff format --check .` - проверка форматирования.
 
 Конфигурация находится в `backend/pyproject.toml`.
+Правила форматирования описаны в разделе `Стиль Python-кода`.
 
 ## Frontend
 

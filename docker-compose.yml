@@ -153,6 +153,15 @@ services:
     volumes:
       - ./backend:/app
 
+  backend-format:
+    profiles:
+      - tools
+    build:
+      context: ./backend
+    command: sh -c "ruff format . && ruff check . --fix"
+    volumes:
+      - ./backend:/app
+
   frontend:
     build:
       context: ./frontend

@@ -40,7 +40,7 @@ lint-frontend:
 format: format-backend format-frontend
 
 format-backend:
-	cd backend && ruff format . && ruff check . --fix
+	docker compose run --rm backend-format
 
 format-frontend:
 	cd frontend && npm run format
