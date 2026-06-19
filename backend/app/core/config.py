@@ -5,11 +5,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "foosball_rating"
+    api_root_path: str = ""
     database_url: str = "postgresql+asyncpg://foosball:foosball@localhost:5432/foosball"
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str = "redis://localhost:6379/1"
     celery_result_backend: str = "redis://localhost:6379/2"
     cors_origins: str = "http://localhost:5173"
+    auth_secret_key: str = "change-me"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 30
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
