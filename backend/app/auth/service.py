@@ -100,3 +100,16 @@ async def rotate_refresh_token(
     await session.commit()
 
     return user, new_token
+
+
+async def logout_refresh_token(session: AsyncSession, token: str) -> None:
+    current_token = await get_refresh_token_by_hash(session, hash_refresh_token(token))
+    if (
+        current_token is None
+        or current_token.revoked_at is not None
+        or current_token.expires_at <= datetime.now(UTC)
+    ):
+        raise InvalidRefreshTokenError
+
+    await revoke_refresh_token(session=session, refresh_token=current_token)
+    await session.commit()

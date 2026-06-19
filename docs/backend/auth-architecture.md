@@ -181,7 +181,7 @@ refresh token received
 - безопасное хеширование паролей;
 - login с выпуском access token и refresh token;
 - refresh token rotation;
-- logout с отзывом refresh token;
+- logout с отзывом refresh token через `POST /auth/logout`;
 - endpoint `/auth/me`;
 - dependency для получения текущего пользователя;
 - защиту одного или нескольких существующих backend endpoint.

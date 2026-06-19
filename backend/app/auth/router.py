@@ -17,6 +17,7 @@ from app.auth.service import (
     InvalidRefreshTokenError,
     authenticate_user,
     issue_refresh_token,
+    logout_refresh_token,
     register_user,
     rotate_refresh_token,
 )
@@ -100,3 +101,18 @@ async def refresh(
         access_token=create_access_token(subject=str(user.id)),
         refresh_token=refresh_token.token,
     )
+
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(
+    payload: RefreshTokenRequest,
+    session: SessionDep,
+) -> None:
+    try:
+        await logout_refresh_token(session, token=payload.refresh_token)
+    except InvalidRefreshTokenError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc

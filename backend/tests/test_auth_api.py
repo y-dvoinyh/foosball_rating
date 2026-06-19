@@ -132,6 +132,45 @@ def test_refresh_rejects_unknown_refresh_token(client: TestClient) -> None:
     assert response.json() == {"detail": "Invalid refresh token"}
 
 
+def test_logout_revokes_refresh_token(
+    client: TestClient,
+    email_prefix: str,
+) -> None:
+    register_response = client.post(
+        "/auth/register",
+        json={
+            "email": f"{email_prefix}@example.com",
+            "password": "correct-password",
+        },
+    )
+    refresh_token = register_response.json()["refresh_token"]
+
+    logout_response = client.post(
+        "/auth/logout",
+        json={"refresh_token": refresh_token},
+    )
+    refresh_response = client.post(
+        "/auth/refresh",
+        json={"refresh_token": refresh_token},
+    )
+
+    assert logout_response.status_code == 204
+    assert logout_response.content == b""
+    assert refresh_response.status_code == 401
+    assert refresh_response.json() == {"detail": "Invalid refresh token"}
+
+
+def test_logout_rejects_unknown_refresh_token(client: TestClient) -> None:
+    response = client.post(
+        "/auth/logout",
+        json={"refresh_token": "unknown-refresh-token-value-that-is-long-enough"},
+    )
+
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Bearer"
+    assert response.json() == {"detail": "Invalid refresh token"}
+
+
 def test_me_returns_current_user(
     client: TestClient,
     email_prefix: str,
