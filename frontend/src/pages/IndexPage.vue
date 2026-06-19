@@ -11,13 +11,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { api } from 'boot/axios';
+import { healthApiService } from 'src/services/api';
 
 const healthStatus = ref('checking...');
 
 onMounted(async () => {
   try {
-    const { data } = await api.get('/health');
+    const data = await healthApiService.getHealth();
     healthStatus.value = `${data.status}, database: ${data.database}`;
   } catch {
     healthStatus.value = 'unavailable';

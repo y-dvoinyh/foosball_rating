@@ -46,6 +46,7 @@ services:
       context: ./backend
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
@@ -70,6 +71,7 @@ services:
     command: alembic upgrade head
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
@@ -89,6 +91,7 @@ services:
     command: pytest
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
@@ -110,6 +113,7 @@ services:
     command: celery -A app.core.celery_app:celery_app worker --loglevel=info
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
@@ -131,6 +135,7 @@ services:
     command: celery -A app.core.celery_app:celery_app beat --loglevel=info
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
