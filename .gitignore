@@ -19,6 +19,7 @@ venv/
 htmlcov/
 .coverage
 coverage/
+celerybeat-schedule
 
 ### Node ###
 node_modules/
