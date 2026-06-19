@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.dependencies import CurrentUserDep
@@ -26,6 +27,7 @@ from app.db.session import get_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
+OAuth2PasswordFormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 @router.get("/me", response_model=CurrentUserResponse)
@@ -67,8 +69,32 @@ async def login(
     payload: LoginRequest,
     session: SessionDep,
 ) -> TokenPairResponse:
+    return await issue_token_pair(
+        session=session,
+        email=payload.email,
+        password=payload.password,
+    )
+
+
+@router.post("/token", response_model=TokenPairResponse, include_in_schema=False)
+async def token(
+    form_data: OAuth2PasswordFormDep,
+    session: SessionDep,
+) -> TokenPairResponse:
+    return await issue_token_pair(
+        session=session,
+        email=form_data.username,
+        password=form_data.password,
+    )
+
+
+async def issue_token_pair(
+    session: AsyncSession,
+    email: str,
+    password: str,
+) -> TokenPairResponse:
     try:
-        user = await authenticate_user(session, email=payload.email, password=payload.password)
+        user = await authenticate_user(session, email=email.strip().lower(), password=password)
     except InvalidCredentialsError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

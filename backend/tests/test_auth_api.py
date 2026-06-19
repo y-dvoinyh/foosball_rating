@@ -91,6 +91,41 @@ def test_login_returns_access_token_for_valid_credentials(
     )
 
 
+def test_oauth_token_endpoint_returns_token_pair_for_swagger_authorize(
+    client: TestClient,
+    email_prefix: str,
+) -> None:
+    email = f"{email_prefix}@example.com"
+    password = "correct-password"
+    register_response = client.post(
+        "/auth/register",
+        json={"email": email, "password": password},
+    )
+
+    response = client.post(
+        "/auth/token",
+        data={"username": email, "password": password},
+    )
+
+    assert register_response.status_code == 201
+    assert response.status_code == 200
+    assert response.json()["refresh_token"]
+    assert decode_access_token(response.json()["access_token"]).subject == (
+        decode_access_token(register_response.json()["access_token"]).subject
+    )
+
+
+def test_openapi_oauth_token_url_is_relative_for_nginx_root_path(
+    client: TestClient,
+) -> None:
+    response = client.get("/openapi.json")
+
+    assert response.status_code == 200
+    assert response.json()["components"]["securitySchemes"]["OAuth2PasswordBearer"][
+        "flows"
+    ]["password"]["tokenUrl"] == "auth/token"
+
+
 def test_refresh_rotates_refresh_token(
     client: TestClient,
     email_prefix: str,
