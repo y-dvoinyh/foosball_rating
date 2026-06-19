@@ -115,7 +115,6 @@ access token и новый refresh token.
 users
   id
   email
-  display_name
   password_hash
   is_active
   is_superuser
