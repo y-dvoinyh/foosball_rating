@@ -16,7 +16,6 @@ describe('AuthApiService', () => {
     const service = new AuthApiService(client);
     const response = {
       access_token: 'access',
-      refresh_token: 'refresh',
       token_type: 'bearer' as const
     };
     vi.mocked(client.post).mockResolvedValue({ data: response });
@@ -37,7 +36,6 @@ describe('AuthApiService', () => {
     vi.mocked(client.post).mockResolvedValue({
       data: {
         access_token: 'access',
-        refresh_token: 'refresh',
         token_type: 'bearer'
       }
     });
@@ -56,28 +54,23 @@ describe('AuthApiService', () => {
     vi.mocked(client.post).mockResolvedValue({
       data: {
         access_token: 'new-access',
-        refresh_token: 'new-refresh',
         token_type: 'bearer'
       }
     });
 
-    await service.refresh({ refresh_token: 'old-refresh' });
+    await service.refresh();
 
-    expect(client.post).toHaveBeenCalledWith('/auth/refresh', {
-      refresh_token: 'old-refresh'
-    }, undefined);
+    expect(client.post).toHaveBeenCalledWith('/auth/refresh', undefined, undefined);
   });
 
-  it('logs out with refresh token', async () => {
+  it('logs out with refresh cookie', async () => {
     const client = createMockClient();
     const service = new AuthApiService(client);
     vi.mocked(client.post).mockResolvedValue({ data: undefined });
 
-    await expect(service.logout({ refresh_token: 'refresh' })).resolves.toBeUndefined();
+    await expect(service.logout()).resolves.toBeUndefined();
 
-    expect(client.post).toHaveBeenCalledWith('/auth/logout', {
-      refresh_token: 'refresh'
-    }, undefined);
+    expect(client.post).toHaveBeenCalledWith('/auth/logout', undefined, undefined);
   });
 
   it('loads current user with bearer access token', async () => {

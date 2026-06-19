@@ -10,13 +10,8 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface RefreshTokenRequest {
-  refresh_token: string;
-}
-
-export interface TokenPairResponse {
+export interface AccessTokenResponse {
   access_token: string;
-  refresh_token: string;
   token_type: 'bearer';
 }
 
@@ -28,20 +23,20 @@ export interface CurrentUserResponse {
 }
 
 export class AuthApiService extends ApiService {
-  register(payload: RegisterRequest): Promise<TokenPairResponse> {
-    return this.post<RegisterRequest, TokenPairResponse>('/auth/register', payload);
+  register(payload: RegisterRequest): Promise<AccessTokenResponse> {
+    return this.post<RegisterRequest, AccessTokenResponse>('/auth/register', payload);
   }
 
-  login(payload: LoginRequest): Promise<TokenPairResponse> {
-    return this.post<LoginRequest, TokenPairResponse>('/auth/login', payload);
+  login(payload: LoginRequest): Promise<AccessTokenResponse> {
+    return this.post<LoginRequest, AccessTokenResponse>('/auth/login', payload);
   }
 
-  refresh(payload: RefreshTokenRequest): Promise<TokenPairResponse> {
-    return this.post<RefreshTokenRequest, TokenPairResponse>('/auth/refresh', payload);
+  refresh(): Promise<AccessTokenResponse> {
+    return this.post<undefined, AccessTokenResponse>('/auth/refresh');
   }
 
-  logout(payload: RefreshTokenRequest): Promise<void> {
-    return this.post<RefreshTokenRequest, void>('/auth/logout', payload);
+  logout(): Promise<void> {
+    return this.post<undefined, void>('/auth/logout');
   }
 
   me(accessToken: string): Promise<CurrentUserResponse> {

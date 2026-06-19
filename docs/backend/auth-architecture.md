@@ -97,7 +97,7 @@ Refresh token:
 - ротируется при каждом refresh-запросе.
 
 При ротации старый refresh token инвалидируется, а клиент получает новый
-access token и новый refresh token.
+access token; новый refresh token устанавливается в cookie.
 
 ## Хранение на клиенте
 
@@ -106,9 +106,9 @@ access token и новый refresh token.
 - access token хранится в памяти frontend-приложения;
 - refresh token хранится в `HttpOnly`, `Secure`, `SameSite` cookie.
 
-На раннем этапе разработки допустимо временно возвращать оба токена в JSON, но
-архитектуру backend проектируем так, чтобы перейти к cookie для refresh token
-без переделки бизнес-логики.
+В локальной разработке cookie может быть без флага `Secure`, потому что
+`Secure` cookie не отправляется браузером по `http://localhost`. Для production
+флаг `Secure` должен быть включен.
 
 ## Данные
 
@@ -149,7 +149,8 @@ email/password correct
   -> issue access token
   -> issue refresh token
   -> save hashed refresh token
-  -> return tokens to client
+  -> return access token to client
+  -> set refresh token as HttpOnly cookie
 ```
 
 Refresh:
@@ -162,7 +163,8 @@ refresh token received
   -> issue new access token
   -> issue new refresh token
   -> save hashed new refresh token
-  -> return new token pair
+  -> return new access token
+  -> set new refresh token as HttpOnly cookie
 ```
 
 Logout:
@@ -171,6 +173,7 @@ Logout:
 refresh token received
   -> hash and find token in DB
   -> mark token as revoked
+  -> clear refresh token cookie
 ```
 
 ## MVP

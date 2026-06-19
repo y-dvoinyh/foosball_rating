@@ -4,25 +4,22 @@ import type {
   CurrentUserResponse,
   LoginRequest,
   RegisterRequest,
-  TokenPairResponse
+  AccessTokenResponse
 } from 'src/services/api';
 import { authApiService } from 'src/services/api';
-import { tokenStorage } from 'src/services/auth/token-storage';
 
 interface AuthState {
   accessToken: string | null;
-  refreshToken: string | null;
   currentUser: CurrentUserResponse | null;
   loading: boolean;
   initialized: boolean;
   errorMessage: string | null;
 }
 
-const storedTokens = tokenStorage.getTokens();
+clearLegacyStoredTokens();
 
 const state = reactive<AuthState>({
-  accessToken: storedTokens?.accessToken ?? null,
-  refreshToken: storedTokens?.refreshToken ?? null,
+  accessToken: null,
   currentUser: null,
   loading: false,
   initialized: false,
@@ -41,15 +38,8 @@ export function useAuth() {
     state.errorMessage = null;
 
     try {
-      if (state.accessToken) {
-        state.currentUser = await authApiService.me(state.accessToken);
-        return;
-      }
-
-      if (state.refreshToken) {
-        const tokens = await authApiService.refresh({ refresh_token: state.refreshToken });
-        await applyTokenPair(tokens);
-      }
+      const tokens = await authApiService.refresh();
+      await applyAccessToken(tokens);
     } catch {
       clearSession();
     } finally {
@@ -67,15 +57,12 @@ export function useAuth() {
   };
 
   const logout = async (): Promise<void> => {
-    const refreshToken = state.refreshToken;
     clearSession();
 
-    if (refreshToken) {
-      try {
-        await authApiService.logout({ refresh_token: refreshToken });
-      } catch {
-        // Local logout should not be blocked by a stale server-side refresh token.
-      }
+    try {
+      await authApiService.logout();
+    } catch {
+      // Local logout should not be blocked by a stale server-side refresh token.
     }
   };
 
@@ -89,13 +76,13 @@ export function useAuth() {
   };
 }
 
-async function authenticate(request: () => Promise<TokenPairResponse>): Promise<void> {
+async function authenticate(request: () => Promise<AccessTokenResponse>): Promise<void> {
   state.loading = true;
   state.errorMessage = null;
 
   try {
     const tokens = await request();
-    await applyTokenPair(tokens);
+    await applyAccessToken(tokens);
   } catch (error) {
     state.errorMessage = error instanceof Error ? error.message : 'Auth request failed';
     throw error;
@@ -104,20 +91,18 @@ async function authenticate(request: () => Promise<TokenPairResponse>): Promise<
   }
 }
 
-async function applyTokenPair(tokens: TokenPairResponse): Promise<void> {
+async function applyAccessToken(tokens: AccessTokenResponse): Promise<void> {
   state.accessToken = tokens.access_token;
-  state.refreshToken = tokens.refresh_token;
-  tokenStorage.saveTokens({
-    accessToken: tokens.access_token,
-    refreshToken: tokens.refresh_token
-  });
   state.currentUser = await authApiService.me(tokens.access_token);
 }
 
 function clearSession(): void {
   state.accessToken = null;
-  state.refreshToken = null;
   state.currentUser = null;
   state.errorMessage = null;
-  tokenStorage.clearTokens();
+}
+
+function clearLegacyStoredTokens(): void {
+  window.localStorage.removeItem('foosball_rating.access_token');
+  window.localStorage.removeItem('foosball_rating.refresh_token');
 }
