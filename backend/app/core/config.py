@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "foosball_rating"
+    api_root_path: str = ""
     database_url: str = "postgresql+asyncpg://foosball:foosball@localhost:5432/foosball"
     redis_url: str = "redis://localhost:6379/0"
     celery_broker_url: str = "redis://localhost:6379/1"
