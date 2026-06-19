@@ -24,7 +24,14 @@
           </template>
         </q-select>
 
-        <q-input v-model="search" dense dark borderless placeholder="Игрок, лига, турнир" class="global-search gt-md">
+        <q-input
+          v-model="search"
+          dense
+          dark
+          borderless
+          placeholder="Игрок, лига, турнир"
+          class="global-search gt-md"
+        >
           <template #prepend>
             <q-icon name="search" />
           </template>
@@ -43,20 +50,22 @@
         <template v-if="isAuthenticated">
           <q-btn-dropdown flat no-caps class="profile-button">
             <template #label>
-              <q-avatar size="28px" color="white" text-color="primary" class="q-mr-sm">ЯД</q-avatar>
-              <span class="gt-xs">Профиль</span>
+              <q-avatar size="28px" color="white" text-color="primary" class="q-mr-sm">{{
+                userInitials
+              }}</q-avatar>
+              <span class="gt-xs">{{ currentUserEmail }}</span>
             </template>
             <q-list>
-              <q-item clickable to="/players/4" v-close-popup>
+              <q-item v-close-popup clickable>
                 <q-item-section avatar><q-icon name="person" /></q-item-section>
-                <q-item-section>Мой профиль</q-item-section>
+                <q-item-section>{{ currentUserEmail }}</q-item-section>
               </q-item>
-              <q-item clickable v-close-popup>
+              <q-item v-if="currentUser?.is_superuser" v-close-popup clickable>
                 <q-item-section avatar><q-icon name="admin_panel_settings" /></q-item-section>
                 <q-item-section>Администрирование</q-item-section>
               </q-item>
               <q-separator />
-              <q-item clickable v-close-popup @click="isAuthenticated = false">
+              <q-item v-close-popup clickable @click="handleLogout">
                 <q-item-section avatar><q-icon name="logout" /></q-item-section>
                 <q-item-section>Выйти</q-item-section>
               </q-item>
@@ -79,16 +88,20 @@
       <q-card class="auth-card">
         <q-card-section>
           <div class="text-h6">Вход</div>
-          <div class="text-caption text-grey-7">После входа кнопка в шапке заменится профилем.</div>
         </q-card-section>
-        <q-card-section class="q-gutter-md">
-          <q-input v-model="loginEmail" outlined dense label="Email" type="email" />
-          <q-input v-model="loginPassword" outlined dense label="Пароль" type="password" />
-        </q-card-section>
-        <q-card-actions align="between">
-          <q-btn flat label="Регистрация" no-caps @click="openRegister" />
-          <q-btn color="primary" label="Войти" no-caps @click="signIn" />
-        </q-card-actions>
+        <q-form @submit.prevent="handleLogin">
+          <q-card-section class="q-gutter-md">
+            <q-banner v-if="authError" rounded class="bg-red-1 text-negative">{{
+              authError
+            }}</q-banner>
+            <q-input v-model="loginEmail" outlined dense label="Email" type="email" />
+            <q-input v-model="loginPassword" outlined dense label="Пароль" type="password" />
+          </q-card-section>
+          <q-card-actions align="between">
+            <q-btn flat label="Регистрация" no-caps @click="openRegister" />
+            <q-btn color="primary" label="Войти" no-caps type="submit" :loading="authLoading" />
+          </q-card-actions>
+        </q-form>
       </q-card>
     </q-dialog>
 
@@ -96,43 +109,55 @@
       <q-card class="auth-card">
         <q-card-section>
           <div class="text-h6">Регистрация</div>
-          <div class="text-caption text-grey-7">Игрок сможет выбрать город или лигу по умолчанию.</div>
         </q-card-section>
-        <q-card-section class="q-gutter-md">
-          <div class="row q-col-gutter-sm">
-            <div class="col-12 col-sm-6"><q-input v-model="registerFirstName" outlined dense label="Имя" /></div>
-            <div class="col-12 col-sm-6"><q-input v-model="registerLastName" outlined dense label="Фамилия" /></div>
-          </div>
-          <q-input v-model="registerEmail" outlined dense label="Email" type="email" />
-          <q-select v-model="registerLeague" outlined dense :options="leagues" label="Лига по умолчанию" />
-          <q-input v-model="registerPassword" outlined dense label="Пароль" type="password" />
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Отмена" no-caps v-close-popup />
-          <q-btn color="primary" label="Создать аккаунт" no-caps @click="signIn" />
-        </q-card-actions>
+        <q-form @submit.prevent="handleRegister">
+          <q-card-section class="q-gutter-md">
+            <q-banner v-if="authError" rounded class="bg-red-1 text-negative">{{
+              authError
+            }}</q-banner>
+            <q-input v-model="registerEmail" outlined dense label="Email" type="email" />
+            <q-input v-model="registerPassword" outlined dense label="Пароль" type="password" />
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn v-close-popup flat label="Отмена" no-caps />
+            <q-btn
+              color="primary"
+              label="Создать аккаунт"
+              no-caps
+              type="submit"
+              :loading="authLoading"
+            />
+          </q-card-actions>
+        </q-form>
       </q-card>
     </q-dialog>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { leagues } from 'src/data/mock-dashboard';
+import { useAuth } from 'src/composables/use-auth';
 
 const selectedLeague = ref('Ярославская лига');
 const filteredLeagues = ref(leagues);
 const search = ref('');
 const loginDialog = ref(false);
 const registerDialog = ref(false);
-const isAuthenticated = ref(false);
 const loginEmail = ref('');
 const loginPassword = ref('');
-const registerFirstName = ref('');
-const registerLastName = ref('');
 const registerEmail = ref('');
-const registerLeague = ref('Ярославская лига');
 const registerPassword = ref('');
+const { state: authState, isAuthenticated, restoreSession, login, register, logout } = useAuth();
+const currentUser = computed(() => authState.currentUser);
+const currentUserEmail = computed(() => currentUser.value?.email ?? 'Профиль');
+const userInitials = computed(() => (currentUser.value?.email.slice(0, 2) || '??').toUpperCase());
+const authLoading = computed(() => authState.loading);
+const authError = computed(() => authState.errorMessage);
+
+onMounted(() => {
+  void restoreSession();
+});
 
 const filterLeagues = (value: string, update: (callback: () => void) => void) => {
   update(() => {
@@ -146,9 +171,25 @@ const openRegister = () => {
   registerDialog.value = true;
 };
 
-const signIn = () => {
+const handleLogin = async () => {
+  await login({
+    email: loginEmail.value,
+    password: loginPassword.value
+  });
   loginDialog.value = false;
+  loginPassword.value = '';
+};
+
+const handleRegister = async () => {
+  await register({
+    email: registerEmail.value,
+    password: registerPassword.value
+  });
   registerDialog.value = false;
-  isAuthenticated.value = true;
+  registerPassword.value = '';
+};
+
+const handleLogout = () => {
+  void logout();
 };
 </script>
