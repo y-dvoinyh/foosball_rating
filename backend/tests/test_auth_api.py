@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from app.auth.tokens import decode_access_token
+from app.auth.tokens import create_access_token, decode_access_token
 
 
 @pytest.fixture
@@ -130,6 +130,60 @@ def test_refresh_rejects_unknown_refresh_token(client: TestClient) -> None:
     assert response.status_code == 401
     assert response.headers["www-authenticate"] == "Bearer"
     assert response.json() == {"detail": "Invalid refresh token"}
+
+
+def test_me_returns_current_user(
+    client: TestClient,
+    email_prefix: str,
+) -> None:
+    email = f"{email_prefix}@example.com"
+    register_response = client.post(
+        "/auth/register",
+        json={"email": email, "password": "correct-password"},
+    )
+
+    response = client.get(
+        "/auth/me",
+        headers={"Authorization": f"Bearer {register_response.json()['access_token']}"},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": int(decode_access_token(register_response.json()["access_token"]).subject),
+        "email": email,
+        "is_active": True,
+        "is_superuser": False,
+    }
+
+
+def test_me_rejects_missing_access_token(client: TestClient) -> None:
+    response = client.get("/auth/me")
+
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Bearer"
+    assert response.json() == {"detail": "Not authenticated"}
+
+
+def test_me_rejects_invalid_access_token(client: TestClient) -> None:
+    response = client.get(
+        "/auth/me",
+        headers={"Authorization": "Bearer invalid-token"},
+    )
+
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Bearer"
+    assert response.json() == {"detail": "Could not validate credentials"}
+
+
+def test_me_rejects_token_for_unknown_user(client: TestClient) -> None:
+    response = client.get(
+        "/auth/me",
+        headers={"Authorization": f"Bearer {create_access_token(subject='999999999')}"},
+    )
+
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Bearer"
+    assert response.json() == {"detail": "Could not validate credentials"}
 
 
 def test_login_rejects_invalid_password(

@@ -3,7 +3,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.dependencies import CurrentUserDep
 from app.auth.schemas import (
+    CurrentUserResponse,
     LoginRequest,
     RefreshTokenRequest,
     RegisterRequest,
@@ -23,6 +25,16 @@ from app.db.session import get_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
+
+
+@router.get("/me", response_model=CurrentUserResponse)
+async def me(current_user: CurrentUserDep) -> CurrentUserResponse:
+    return CurrentUserResponse(
+        id=current_user.id,
+        email=current_user.email,
+        is_active=current_user.is_active,
+        is_superuser=current_user.is_superuser,
+    )
 
 
 @router.post(

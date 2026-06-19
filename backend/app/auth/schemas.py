@@ -35,3 +35,10 @@ class TokenPairResponse(BaseModel):
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str = Field(min_length=32)
+
+
+class CurrentUserResponse(BaseModel):
+    id: int
+    email: str
+    is_active: bool
+    is_superuser: bool
