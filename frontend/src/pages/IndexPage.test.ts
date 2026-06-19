@@ -27,7 +27,7 @@ describe('IndexPage', () => {
     await flushPromises();
 
     expect(mockedGetHealth).toHaveBeenCalled();
-    expect(wrapper.text()).toContain('Foosball Rating');
+    expect(wrapper.text()).toContain('Публичная статистика кикера');
     expect(wrapper.text()).toContain('Backend health: ok, database: ok');
   });
 
