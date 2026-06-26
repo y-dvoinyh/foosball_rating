@@ -3,7 +3,8 @@ from datetime import timedelta
 import jwt
 import pytest
 
-from app.auth.tokens import (
+from app.core.config import settings
+from app.modules.auth.tokens import (
     ACCESS_TOKEN_TYPE,
     JWT_ALGORITHM,
     AccessTokenError,
@@ -12,7 +13,6 @@ from app.auth.tokens import (
     decode_access_token,
     hash_refresh_token,
 )
-from app.core.config import settings
 
 
 def test_create_access_token_can_be_decoded() -> None:

@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     auth_secret_key: str = "change-me"
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 30
+    refresh_token_cookie_secure: bool = False
+    dev_superuser_email: str = ""
+    dev_superuser_password: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

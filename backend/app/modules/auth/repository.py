@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.models import RefreshToken, User
+from app.modules.auth.models import RefreshToken, User
 
 
 async def get_user_by_email(session: AsyncSession, email: str) -> User | None:

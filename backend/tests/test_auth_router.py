@@ -1,4 +1,4 @@
-from app.auth.router import router
+from app.modules.auth.router import router
 
 
 def test_auth_router_has_stable_prefix_and_tag() -> None:
