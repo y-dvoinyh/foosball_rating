@@ -10,6 +10,7 @@
       </div>
       <div class="dashboard-hero__actions">
         <q-btn color="white" text-color="primary" icon="leaderboard" label="Открыть рейтинг" to="/rating" no-caps />
+        <q-btn color="white" text-color="primary" icon="account_tree" label="Сетка плейофф" to="/playoff" no-caps />
         <q-btn outline color="white" icon="compare_arrows" label="Сравнить игроков" to="/compare" no-caps />
       </div>
     </div>

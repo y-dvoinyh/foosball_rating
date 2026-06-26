@@ -43,6 +43,11 @@
           <q-route-tab to="/tournaments/spring" label="Турнир" />
           <q-route-tab to="/events" label="События" />
           <q-route-tab to="/compare" label="Сравнение" />
+          <q-route-tab
+            v-if="currentUser?.is_superuser"
+            to="/admin"
+            label="Администрирование"
+          />
         </q-tabs>
 
         <q-space />
@@ -56,11 +61,16 @@
               <span class="gt-xs">{{ currentUserEmail }}</span>
             </template>
             <q-list>
-              <q-item v-close-popup clickable>
+              <q-item v-close-popup clickable to="/profile">
                 <q-item-section avatar><q-icon name="person" /></q-item-section>
-                <q-item-section>{{ currentUserEmail }}</q-item-section>
+                <q-item-section>
+                  <q-item-label>{{ currentUserEmail }}</q-item-label>
+                  <q-item-label v-if="currentUser?.is_superuser" caption>
+                    Администратор
+                  </q-item-label>
+                </q-item-section>
               </q-item>
-              <q-item v-if="currentUser?.is_superuser" v-close-popup clickable>
+              <q-item v-if="currentUser?.is_superuser" v-close-popup clickable to="/admin">
                 <q-item-section avatar><q-icon name="admin_panel_settings" /></q-item-section>
                 <q-item-section>Администрирование</q-item-section>
               </q-item>
@@ -135,7 +145,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { leagues } from 'src/data/mock-dashboard';
 import { useAuth } from 'src/composables/use-auth';
 
@@ -148,6 +159,8 @@ const loginEmail = ref('');
 const loginPassword = ref('');
 const registerEmail = ref('');
 const registerPassword = ref('');
+const route = useRoute();
+const router = useRouter();
 const { state: authState, isAuthenticated, restoreSession, login, register, logout } = useAuth();
 const currentUser = computed(() => authState.currentUser);
 const currentUserEmail = computed(() => currentUser.value?.email ?? 'Профиль');
@@ -157,7 +170,20 @@ const authError = computed(() => authState.errorMessage);
 
 onMounted(() => {
   void restoreSession();
+
+  if (route.query.login === '1') {
+    loginDialog.value = true;
+  }
 });
+
+watch(
+  () => route.query.login,
+  (loginQuery) => {
+    if (loginQuery === '1' && !isAuthenticated.value) {
+      loginDialog.value = true;
+    }
+  }
+);
 
 const filterLeagues = (value: string, update: (callback: () => void) => void) => {
   update(() => {
@@ -178,6 +204,10 @@ const handleLogin = async () => {
   });
   loginDialog.value = false;
   loginPassword.value = '';
+
+  if (typeof route.query.redirect === 'string') {
+    await router.push(route.query.redirect);
+  }
 };
 
 const handleRegister = async () => {
@@ -189,7 +219,11 @@ const handleRegister = async () => {
   registerPassword.value = '';
 };
 
-const handleLogout = () => {
-  void logout();
+const handleLogout = async () => {
+  await logout();
+
+  if (route.path === '/admin') {
+    await router.push('/');
+  }
 };
 </script>
