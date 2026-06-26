@@ -46,11 +46,18 @@ services:
       context: ./backend
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
       CELERY_RESULT_BACKEND: ${CELERY_RESULT_BACKEND}
       CORS_ORIGINS: ${CORS_ORIGINS}
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS}
+      REFRESH_TOKEN_COOKIE_SECURE: ${REFRESH_TOKEN_COOKIE_SECURE}
+      DEV_SUPERUSER_EMAIL: ${DEV_SUPERUSER_EMAIL}
+      DEV_SUPERUSER_PASSWORD: ${DEV_SUPERUSER_PASSWORD}
       WATCHFILES_FORCE_POLLING: "true"
     ports:
       - "${BACKEND_PORT}:8000"
@@ -70,6 +77,7 @@ services:
     command: alembic upgrade head
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
@@ -89,6 +97,7 @@ services:
     command: pytest
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
@@ -110,6 +119,7 @@ services:
     command: celery -A app.core.celery_app:celery_app worker --loglevel=info
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}
@@ -131,6 +141,7 @@ services:
     command: celery -A app.core.celery_app:celery_app beat --loglevel=info
     environment:
       APP_NAME: ${APP_NAME}
+      API_ROOT_PATH: ${API_ROOT_PATH}
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
       CELERY_BROKER_URL: ${CELERY_BROKER_URL}

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.core.config import settings
 from app.models import Base
+from app.modules.auth import models as auth_models  # noqa: F401
 
 config = context.config
 

@@ -44,9 +44,11 @@ nav:
           - "0001: FastAPI stack": architecture/adr/0001-fastapi-stack.md
           - "0002: Git workflow": architecture/adr/0002-git-workflow.md
           - "0003: Auth without Keycloak": architecture/adr/0003-auth-without-keycloak.md
+          - "0004: Backend modular monolith": architecture/adr/0004-backend-modular-monolith.md
   - Backend:
       - Обзор: backend/overview.md
       - Фоновые задачи: backend/background-jobs.md
+      - Архитектура аутентификации: backend/auth-architecture.md
       - Аутентификация и права: backend/auth-and-permissions.md
       - Импорт данных: backend/import.md
       - Расчет рейтинга: backend/rating-calculation.md

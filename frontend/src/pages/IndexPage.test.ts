@@ -2,39 +2,37 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import IndexPage from './IndexPage.vue';
-import { api } from 'boot/axios';
+import { healthApiService } from 'src/services/api';
 
-vi.mock('boot/axios', () => ({
-  api: {
-    get: vi.fn()
+vi.mock('src/services/api', () => ({
+  healthApiService: {
+    getHealth: vi.fn()
   }
 }));
 
-const mockedApiGet = vi.mocked(api.get);
+const mockedGetHealth = vi.mocked(healthApiService.getHealth);
 
 describe('IndexPage', () => {
   beforeEach(() => {
-    mockedApiGet.mockReset();
+    mockedGetHealth.mockReset();
   });
 
   it('shows backend health status when request succeeds', async () => {
-    mockedApiGet.mockResolvedValue({
-      data: {
-        status: 'ok',
-        database: 'ok'
-      }
+    mockedGetHealth.mockResolvedValue({
+      status: 'ok',
+      database: 'ok'
     });
 
     const wrapper = mount(IndexPage);
     await flushPromises();
 
-    expect(mockedApiGet).toHaveBeenCalledWith('/health');
-    expect(wrapper.text()).toContain('Foosball Rating');
+    expect(mockedGetHealth).toHaveBeenCalled();
+    expect(wrapper.text()).toContain('Публичная статистика кикера');
     expect(wrapper.text()).toContain('Backend health: ok, database: ok');
   });
 
   it('shows unavailable status when request fails', async () => {
-    mockedApiGet.mockRejectedValue(new Error('network error'));
+    mockedGetHealth.mockRejectedValue(new Error('network error'));
 
     const wrapper = mount(IndexPage);
     await flushPromises();
