@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from app.auth.tokens import create_access_token, decode_access_token
+from app.modules.auth.tokens import create_access_token, decode_access_token
 
 
 @pytest.fixture
@@ -134,9 +134,12 @@ def test_openapi_oauth_token_url_is_relative_for_nginx_root_path(
     response = client.get("/openapi.json")
 
     assert response.status_code == 200
-    assert response.json()["components"]["securitySchemes"]["OAuth2PasswordBearer"][
-        "flows"
-    ]["password"]["tokenUrl"] == "auth/token"
+    assert (
+        response.json()["components"]["securitySchemes"]["OAuth2PasswordBearer"]["flows"][
+            "password"
+        ]["tokenUrl"]
+        == "auth/token"
+    )
 
 
 def test_refresh_rotates_refresh_token(

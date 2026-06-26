@@ -1,5 +1,5 @@
-from app.auth.models import RefreshToken, User
 from app.models.base import Base
+from app.modules.auth.models import RefreshToken, User
 
 
 def test_user_model_is_registered_in_metadata() -> None:

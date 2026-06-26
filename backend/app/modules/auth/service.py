@@ -3,8 +3,8 @@ from datetime import UTC, datetime
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.models import User
-from app.auth.repository import (
+from app.modules.auth.models import User
+from app.modules.auth.repository import (
     create_refresh_token_record,
     create_user,
     get_refresh_token_by_hash,
@@ -12,8 +12,8 @@ from app.auth.repository import (
     get_user_by_id,
     revoke_refresh_token,
 )
-from app.auth.security import hash_password, verify_password
-from app.auth.tokens import RefreshTokenData, create_refresh_token, hash_refresh_token
+from app.modules.auth.security import hash_password, verify_password
+from app.modules.auth.tokens import RefreshTokenData, create_refresh_token, hash_refresh_token
 
 
 class EmailAlreadyRegisteredError(ValueError):

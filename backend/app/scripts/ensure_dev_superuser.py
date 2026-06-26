@@ -2,11 +2,11 @@ import asyncio
 
 from sqlalchemy.exc import IntegrityError
 
-from app.auth.models import User
-from app.auth.repository import get_user_by_email
-from app.auth.security import hash_password
 from app.core.config import settings
 from app.db.session import async_session_factory, engine
+from app.modules.auth.models import User
+from app.modules.auth.repository import get_user_by_email
+from app.modules.auth.security import hash_password
 
 
 async def ensure_dev_superuser() -> None:

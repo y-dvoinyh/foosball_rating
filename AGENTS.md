@@ -29,7 +29,9 @@
 - `frontend` contains the public UI and future admin panel.
 - `backend` contains API, domain logic, auth, permissions, import, rating calculation, and background task integration.
 - `docs` contains detailed project documentation; keep `AGENTS.md` as a compact operational summary for agents.
-- Main backend domains planned in docs: players, tournaments, competitions, teams, matches/sets, ratings/history, imports, background tasks, users/roles/scopes.
+- Backend uses a feature-first modular monolith. Main modules: `auth`, `players`, `competitions`, `ratings`, `imports`.
+- `competitions` owns leagues, seasons, competitions, teams, matches, and sets. Do not create separate top-level backend modules for each of those at the start.
+- Live behavior is not a separate domain module at the start: external polling belongs to `imports`; recalculation and prepared snapshots belong to `ratings`.
 
 ## Git Workflow
 
@@ -61,12 +63,15 @@ Prefer small, easy-to-review iterations. Keep verification proportional to the r
 
 ## Architecture Principles
 
+- Keep backend domain boundaries coarse and practical: prefer `backend/app/modules/<domain>/` modules over scattered global `models`, `schemas`, and `services` for new domain code.
+- Simple modules may stay flat with `models.py`, `schemas.py`, `repository.py`, `service.py`, `router.py`, and `tasks.py`; introduce `domain/`, `application/`, `infrastructure/`, and `presentation/` only when module complexity justifies it.
 - Public pages should read prepared data and be optimized for read performance.
 - Heavy operations, imports, and rating recalculations should run in background jobs, not in long HTTP requests.
 - Imported source data should be preserved for debugging and reproducibility.
 - Database schema changes must be represented as Alembic migrations.
 - Auth is a modular monolith inside the backend for now, with a clear boundary so it can be extracted later.
 - Other backend modules should use auth dependencies/service interfaces instead of parsing JWTs, touching refresh tokens, or reading auth internals directly.
+- Rating calculation should have a pure core that does not depend on FastAPI, SQLAlchemy, Celery, or Redis; routers and tasks should call application services instead of containing rating or import business logic.
 - The frontend public pages should be fast and comfortable for viewing.
 - The admin panel should be a practical work tool, not a decorative page.
 - Use Quasar components for tables, filters, and forms.

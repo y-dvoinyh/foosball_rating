@@ -4,14 +4,16 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.dependencies import CurrentUserDep
-from app.auth.schemas import (
+from app.core.config import settings
+from app.db.session import get_session
+from app.modules.auth.dependencies import CurrentUserDep
+from app.modules.auth.schemas import (
     AccessTokenResponse,
     CurrentUserResponse,
     LoginRequest,
     RegisterRequest,
 )
-from app.auth.service import (
+from app.modules.auth.service import (
     EmailAlreadyRegisteredError,
     InvalidCredentialsError,
     InvalidRefreshTokenError,
@@ -21,9 +23,7 @@ from app.auth.service import (
     register_user,
     rotate_refresh_token,
 )
-from app.auth.tokens import create_access_token
-from app.core.config import settings
-from app.db.session import get_session
+from app.modules.auth.tokens import create_access_token
 
 REFRESH_TOKEN_COOKIE_NAME = "refresh_token"
 AUTH_SESSION_COOKIE_NAME = "auth_session"
